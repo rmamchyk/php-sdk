@@ -100,11 +100,11 @@ class Predicate
 
     private function evaluatePredicate($context, $predicate, array &$passedRules, array &$failedRules): bool
     {
-        $rules = $predicate['rules'];
-
-        if (!$rules) {
+        if (!isset($predicate['rules'])) {
             return true;
         }
+
+        $rules = $predicate['rules'];
 
         for ($i = 0; $i < count($rules); $i++) { 
             $passed = $this->evaluateRule($context, $predicate, $rules[$i], $passedRules, $failedRules);

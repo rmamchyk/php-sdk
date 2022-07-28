@@ -62,6 +62,11 @@ function display($arr, $title = null)
         border: 1px solid #ccc;
         border-radius: 4px;
       }
+
+      p {
+        color: grey;
+        margin-bottom: 5px;
+      }
     </style>
 
     
@@ -126,6 +131,8 @@ function display($arr, $title = null)
 
             $client->context->set('native.newUser', true);
             $client->context->set('native.pageCategory', 'home');
+
+            display($client->context->remoteContext, 'Remote Context:');
 
           ?>
       </div>

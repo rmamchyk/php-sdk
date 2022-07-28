@@ -14,6 +14,7 @@ use function App\Utils\flattenKeys;
 use function App\Utils\filter;
 use function App\Utils\getValueForKey;
 use function App\Utils\prune;
+use function App\Utils\hashCode;
 
 require_once __DIR__ . '/EvolvContext.php';
 require_once __DIR__ . '/Predicate.php';
@@ -23,6 +24,7 @@ require_once __DIR__ . '/Utils/filter.php';
 require_once __DIR__ . '/Utils/prune.php';
 require_once __DIR__ . '/Utils/getValueForKey.php';
 require_once __DIR__ . '/Utils/waitForIt.php';
+require_once __DIR__ . '/Utils/hashCode.php';
 
 const CONFIG_SOURCE = 'config';
 const GENOME_SOURCE = 'genome';
@@ -208,10 +210,10 @@ class EvolvStore
                 $activeKeyStates[] = $key;
             }
 
-            $allocation = array_filter($this->allocations, function($a) use ($eid) { return $a['eid'] === $eid; })[0];
-            if (isset($allocation)) {
-                $this->evaluateAllocationPredicates();
-            }
+            // $allocation = array_filter($this->allocations, function($a) use ($eid) { return $a['eid'] === $eid; })[0];
+            // if (isset($allocation)) {
+            //     $this->evaluateAllocationPredicates();
+            // }
 
             $entryKeyStates = [];
 
@@ -276,7 +278,7 @@ class EvolvStore
                 }
                 $pruned = prune($this->effectiveGenome, $active);
                 foreach($pruned as $key => $value) {
-                    $this->activeVariants[] = $key . ':' . 'hashCode';
+                    $this->activeVariants[] = $key . ':' . hashCode(json_encode($value));
                 }
             }
         }
@@ -388,10 +390,10 @@ class EvolvStore
             foreach($keys as $key) {
                 $expLoaded[] = $key;
             }
-
-            $this->context->set('experiments.allocations', $allocs);
-            $this->context->set('experiments.exclusions', $exclusions);
         }
+
+        $this->context->set('experiments.allocations', $allocs);
+        $this->context->set('experiments.exclusions', $exclusions);
     }
 
     private function update($config, $allocation)

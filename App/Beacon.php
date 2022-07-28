@@ -44,25 +44,9 @@ class Beacon {
         );
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
 
-        $data = <<<DATA
-        $data
-        DATA;
-
         curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
 
         $res = curl_exec($curl);
-
-        if ($this->v1Events) {
-            echo $this->endpoint;
-    
-            echo '<pre>';
-            print_r($data);
-            echo '</pre>';
-
-            echo "<pre>";
-            print_r($res);
-            echo "</pre>";
-        }
 
         curl_close($curl);
 

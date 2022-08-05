@@ -1,54 +1,49 @@
-<h1>Evolv Php Sdk</h1>
+evolv/php-sdk
+=============
 
-<h2>Install Php-Sdk through composer:</h2>
-
+### Package Installation
+- requires php >= 7.4.0
 
 ```php
   composer require evolv/php-sdk
 ```
 
-<h2>Install</h2>
+### Package Usage
+
+```php
+  <?php
+
+  use Evolv\EvolvClient;
+
+  $client = new EvolvClient($environment, $endpoint);
+  $client->initialize($uid);
+
+```
+
+### Available Development Scripts:
+
+- install dependencies
 
 ```php
   composer install
 ```
-<h2>Start Eхample</h2>
+
+- run the apache server with php 7.4.0
 
 ```php
   composer start
 ```
 
-<h2>Generate Documentation</h2>
+- generate documentation
 
 ```php
   composer docs
 ```
 
-<h2>Run Tests</h2>
+- run unit tests
 
 ```php
   composer test
-```
-
-
-<h2>Package Usage</h2>
-
-```php
-  <?php
-
-  declare (strict_types=1);
-
-  require_once __DIR__ . '/vendor/autoload.php';
-  use Evolv\EvolvClient;
-```
-
-<h2>Client Initialization</h2>
-
-```php
-  <?php
-
-  $client = new EvolvClient($environment, $endpoint);
-  $client->initialize($uid);
 ```
 
 <h2>About Evolv Product</h2>

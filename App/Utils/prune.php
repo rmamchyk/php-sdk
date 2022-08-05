@@ -10,7 +10,7 @@ function prune(array $array, array $active)
         $keys = explode('.', $key);
         $current = $array;
         for ($i = 0; $i < count($keys); $i++) { 
-            $now = $current[$keys[$i]];
+            $now = isset($keys[$i]) && isset($current[$keys[$i]]) ? $current[$keys[$i]] : null;
             if (isset($now)) {
                 if ($i === (count($keys) - 1)) {
                     $pruned[$key] = $now;

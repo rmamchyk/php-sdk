@@ -7,7 +7,6 @@ namespace Evolv;
 class HttpClient {
     public function request(string $url)
     {
-
         $opts = array(
             'https' => array(
                 'method' => "GET",

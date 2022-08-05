@@ -51,7 +51,7 @@ class EvolvClient
      * @return array
      */
 
-    public function initialize(string $uid, $httpClients = null, array $remoteContext = [], array $localContext = [])
+    public function initialize(string $uid, array $remoteContext = [], array $localContext = [], $httpClient = null)
     {
 
         if ($this->initialized) {
@@ -65,7 +65,7 @@ class EvolvClient
         }
 
         $this->context->initialize($uid, $remoteContext, $localContext);
-        $this->store->initialize($this->context, $httpClients);
+        $this->store->initialize($this->context, $httpClient);
 
         if ($this->autoconfirm) {
             $this->confirm();

@@ -101,7 +101,6 @@ class EvolvStore
         $this->environment = $environment;
         $this->endpoint = $endpoint;
 
-        $this->httpClient = new HttpClient();
         $this->predicate = new Predicate();
     }
 

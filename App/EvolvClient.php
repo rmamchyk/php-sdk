@@ -215,11 +215,11 @@ class EvolvClient
             $this->context->update(['experiments' => ['confirmations' => $newConfirmations]]);
 
             foreach ($confirmableAllocations as $alloc) {
-                $this->eventBeacon->emit('confirmation', array_merge([
+                $this->eventBeacon->emit('confirmation', [
                     'uid' => $alloc['uid'],
                     'eid' => $alloc['eid'],
                     'cid' => $alloc['cid']
-                ], $this->context->remoteContext));
+                ]);
             };
 
             $this->eventBeacon->flush();
@@ -271,12 +271,12 @@ class EvolvClient
         $this->context->update(['experiments' => ['contaminations' => $newContaminations]]);
 
         foreach ($contaminatableAllocations as $alloc) {
-            $this->eventBeacon->emit('contamination', array_merge([
+            $this->eventBeacon->emit('contamination', [
                 'uid' => $alloc['uid'],
                 'eid' => $alloc['eid'],
                 'cid' => $alloc['cid'],
                 'contaminationReason' => $details
-            ], $this->context->remoteContext));
+            ]);
         };
     
         $this->eventBeacon->flush();

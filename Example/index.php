@@ -62,6 +62,11 @@ function display($arr, $title = null)
             border: 1px solid #ccc;
             border-radius: 4px;
         }
+
+        p {
+            color: grey;
+            margin-bottom: 5px;
+        }
     </style>
 
 

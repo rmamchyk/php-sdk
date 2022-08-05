@@ -15,12 +15,14 @@ use function Evolv\Utils\flattenKeys;
 use function Evolv\Utils\filter;
 use function Evolv\Utils\getValueForKey;
 use function Evolv\Utils\prune;
+use function Evolv\Utils\hashCode;
 
 require_once __DIR__ . '/Utils/flattenKeys.php';
 require_once __DIR__ . '/Utils/filter.php';
 require_once __DIR__ . '/Utils/prune.php';
 require_once __DIR__ . '/Utils/getValueForKey.php';
 require_once __DIR__ . '/Utils/waitForIt.php';
+require_once __DIR__ . '/Utils/hashCode.php';
 
 const CONFIG_SOURCE = 'config';
 const GENOME_SOURCE = 'genome';
@@ -212,10 +214,10 @@ class EvolvStore
                 $activeKeyStates[] = $key;
             }
 
-            $allocation = array_filter($this->allocations, function($a) use ($eid) { return $a['eid'] === $eid; })[0];
-            if (isset($allocation)) {
-                $this->evaluateAllocationPredicates();
-            }
+            // $allocation = array_filter($this->allocations, function($a) use ($eid) { return $a['eid'] === $eid; })[0];
+            // if (isset($allocation)) {
+            //     $this->evaluateAllocationPredicates();
+            // }
 
             $entryKeyStates = [];
 
@@ -279,8 +281,8 @@ class EvolvStore
                     $this->activeKeys[] = $key;
                 }
                 $pruned = prune($this->effectiveGenome, $active);
-                foreach ($pruned as $key => $value) {
-                    $this->activeVariants[] = $key . ':' . 'hashCode';
+                foreach($pruned as $key => $value) {
+                    $this->activeVariants[] = $key . ':' . hashCode(json_encode($value));
                 }
             }
         }
@@ -394,10 +396,10 @@ class EvolvStore
             foreach ($keys as $key) {
                 $expLoaded[] = $key;
             }
-
-            $this->context->set('experiments.allocations', $allocs);
-            $this->context->set('experiments.exclusions', $exclusions);
         }
+
+        $this->context->set('experiments.allocations', $allocs);
+        $this->context->set('experiments.exclusions', $exclusions);
     }
 
     private function update($config, $allocation)

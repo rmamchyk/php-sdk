@@ -41,12 +41,9 @@ class Beacon {
             "Content-Type: application/json",
         );
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-
-
         curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
 
         curl_exec($curl);
-
 
         curl_close($curl);
 

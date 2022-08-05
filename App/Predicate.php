@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App;
+namespace Evolv;
 
-use function App\Utils\getValueForKey;
+use function Evolv\Utils\getValueForKey;
 
 require_once __DIR__ . '/../App/Utils/getValueForKey.php';
 
@@ -37,14 +37,14 @@ class Predicate
             'contains' => function ($a, $b) { return in_array($a, $b); },
             'defined' => function ($a, $b) { return (isset($a) && !empty($a)) ? true : false; },
             'equal' => function ($a, $b) { return $a === $b; },
-            'exists' => function ($a, $b) { return $a !== null; },
+            'exists' => function ($a, $b) { return isset($a); },
             'greater_than' => function ($a, $b) { return ($a > $b) ? true : false; },
             'greater_than_or_equal_to' => function ($a, $b) { ($a >= $b) ? true : false; },
             'is_true' => function ($a, $b) { return $a === true; },
             'is_false' => function ($a, $b) { return $a === false; },
-            'not_exists' => function ($a, $b) { return $a === null; },
+            'not_exists' => function ($a, $b) { return !isset($a); },
             'not_contains' => function ($a, $b) { return !in_array($a, $b); },
-            'not_defined' => function ($a, $b) { return (isset($a) == false && empty($a)) ? true : false; },
+            'not_defined' => function ($a, $b) { return (isset($a) && empty($a)) ? true : false; },
             'not_equal' => function ($a, $b) { return ($a !== $b) ? true : false; },
             'not_regex_match' => function ($value, $pattern) { return !preg_match($value, $pattern, $matches); },
             'not_regex64_match' => function ($value, $pattern) { return !regex64Match($value, $pattern); },
@@ -63,7 +63,8 @@ class Predicate
         ];
     }
 
-    private function evaluateFilter($context, $rule): bool {
+    private function evaluateFilter($context, $rule): bool
+    {
         $value = getValueForKey($rule['field'], $context);
 
         if (strpos($rule['operator'], 'kv_') === 0 && !$value) {
@@ -73,7 +74,8 @@ class Predicate
         return $this->filters[$rule['operator']]($value, $rule['value']);
     }
 
-    private function evaluateRule($context, $predicate, $rule, array &$passedRules, array &$failedRules): bool {
+    private function evaluateRule($context, $predicate, $rule, array &$passedRules, array &$failedRules): bool
+    {
         $result = false;
 
         if (isset($rule['combinator'])) {
@@ -100,11 +102,11 @@ class Predicate
 
     private function evaluatePredicate($context, $predicate, array &$passedRules, array &$failedRules): bool
     {
-        $rules = $predicate['rules'];
-
-        if (!$rules) {
+        if (!isset($predicate['rules'])) {
             return true;
         }
+
+        $rules = $predicate['rules'];
 
         for ($i = 0; $i < count($rules); $i++) { 
             $passed = $this->evaluateRule($context, $predicate, $rules[$i], $passedRules, $failedRules);
@@ -147,11 +149,11 @@ class Predicate
 
         $result['rejected'] = !$this->evaluatePredicate($context, $predicate, $result['passed'], $result['failed']);
 
-        foreach($result['passed'] as $item) {
+        foreach ($result['passed'] as $item) {
             $result['touched'][] = $item['field'];
         }
 
-        foreach($result['failed'] as $item) {
+        foreach ($result['failed'] as $item) {
             $result['touched'][] = $item['field'];
         }
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Utils;
+namespace Evolv\Utils;
 
 function flatten_recursive(array $current, string $parentKey) {
     $items = [];

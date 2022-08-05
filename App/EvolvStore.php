@@ -2,27 +2,27 @@
 
 declare(strict_types=1);
 
-namespace App;
+namespace Evolv;
 
-use App\EvolvContext;
-use App\Predicate;
-use App\HttpClient;
+use Evolv\EvolvContext;
+use Evolv\HttpClient;
+use Evolv\Predicate;
 
-use function App\Utils\waitFor;
-use function App\Utils\emit;
-use function App\Utils\flattenKeys;
-use function App\Utils\filter;
-use function App\Utils\getValueForKey;
-use function App\Utils\prune;
 
-require_once __DIR__ . '/EvolvContext.php';
-require_once __DIR__ . '/Predicate.php';
-require_once __DIR__ . '/HttpClient.php';
+use function Evolv\Utils\waitFor;
+use function Evolv\Utils\emit;
+use function Evolv\Utils\flattenKeys;
+use function Evolv\Utils\filter;
+use function Evolv\Utils\getValueForKey;
+use function Evolv\Utils\prune;
+use function Evolv\Utils\hashCode;
+
 require_once __DIR__ . '/Utils/flattenKeys.php';
 require_once __DIR__ . '/Utils/filter.php';
 require_once __DIR__ . '/Utils/prune.php';
 require_once __DIR__ . '/Utils/getValueForKey.php';
 require_once __DIR__ . '/Utils/waitForIt.php';
+require_once __DIR__ . '/Utils/hashCode.php';
 
 const CONFIG_SOURCE = 'config';
 const GENOME_SOURCE = 'genome';
@@ -38,20 +38,23 @@ const EFFECTIVE_GENOME_UPDATED = 'effective.genome.updated';
 const STORE_DESTROYED = 'store.destroyed';
 
 
-function startsWith( $haystack, $needle ) {
-    $length = strlen( $needle );
-    return substr( $haystack, 0, $length ) === $needle;
+function startsWith($haystack, $needle)
+{
+    $length = strlen($needle);
+    return substr($haystack, 0, $length) === $needle;
 }
 
-function endsWith( $haystack, $needle ) {
-    $length = strlen( $needle );
-    if( !$length ) {
+function endsWith($haystack, $needle)
+{
+    $length = strlen($needle);
+    if (!$length) {
         return true;
     }
-    return substr( $haystack, -$length ) === $needle;
+    return substr($haystack, -$length) === $needle;
 }
 
-function array_some(array $array, callable $filter) {
+function array_some(array $array, callable $filter)
+{
     foreach ($array as $value) {
         if ($filter($value)) {
             return true;
@@ -98,7 +101,6 @@ class EvolvStore
         $this->environment = $environment;
         $this->endpoint = $endpoint;
 
-        $this->httpClient = new HttpClient();
         $this->predicate = new Predicate();
     }
 
@@ -120,21 +122,24 @@ class EvolvStore
             $entry[] = $prefix;
         }
 
-        $keys = array_filter(array_keys($config), function($key) { return !startsWith($key, '_'); });
-    
-        foreach($keys as $key) {
+        $keys = array_filter(array_keys($config), function ($key) {
+            return !startsWith($key, '_');
+        });
+
+        foreach ($keys as $key) {
             $this->evaluateBranch($context, $config[$key], $prefix ? ($prefix . '.' . $key) : $key, $disabled, $entry);
         }
     }
 
-    private function evaluatePredicates(array $context, array $config) {
+    private function evaluatePredicates(array $context, array $config)
+    {
         $result = [];
 
         if (!isset($config['_experiments']) || !count($config['_experiments'])) {
             return $result;
         }
 
-        foreach($config['_experiments'] as $exp) {
+        foreach ($config['_experiments'] as $exp) {
             $evaluableConfig = $exp;
             unset($evaluableConfig['id']);
             $expResult = [
@@ -156,14 +161,14 @@ class EvolvStore
             'entry' => []
         ];
 
-        foreach($keyStatesLoaded as $key) {
-            $active = !array_some($results['disabled'], function($disabledKey) use ($key) {
+        foreach ($keyStatesLoaded as $key) {
+            $active = !array_some($results['disabled'], function ($disabledKey) use ($key) {
                 return startsWith($key, $disabledKey);
             });
 
             if ($active) {
                 $expKeyStates['active'][] = $key;
-                $entry = array_some($results['entry'], function($entryKey) use ($key) {
+                $entry = array_some($results['entry'], function ($entryKey) use ($key) {
                     return startsWith($key, $entryKey);
                 });
 
@@ -185,7 +190,7 @@ class EvolvStore
     {
         $results = $this->evaluatePredicates($this->context->resolve(), $this->config);
 
-        foreach($results as $eid => $expResults) {
+        foreach ($results as $eid => $expResults) {
             $expConfigKeyStates = &$this->configKeyStates['experiments'][$eid];
             if (!isset($expConfigKeyStates)) {
                 return;
@@ -196,7 +201,7 @@ class EvolvStore
             $loadedKeys = [];
 
             if (isset($expConfigLoaded)) {
-                foreach($expConfigLoaded as $key) {
+                foreach ($expConfigLoaded as $key) {
                     $loadedKeys[] = $key;
                 }
             }
@@ -204,18 +209,18 @@ class EvolvStore
             $newExpKeyStates = $this->getActiveAndEntryExperimentKeyStates($expResults, $loadedKeys);
 
             $activeKeyStates = [];
-            foreach($newExpKeyStates['active'] as $key) {
+            foreach ($newExpKeyStates['active'] as $key) {
                 $activeKeyStates[] = $key;
             }
 
-            $allocation = array_filter($this->allocations, function($a) use ($eid) { return $a['eid'] === $eid; })[0];
-            if (isset($allocation)) {
-                $this->evaluateAllocationPredicates();
-            }
+            // $allocation = array_filter($this->allocations, function($a) use ($eid) { return $a['eid'] === $eid; })[0];
+            // if (isset($allocation)) {
+            //     $this->evaluateAllocationPredicates();
+            // }
 
             $entryKeyStates = [];
 
-            foreach($newExpKeyStates['entry'] as $key) {
+            foreach ($newExpKeyStates['entry'] as $key) {
                 $entryKeyStates[] = $key;
             }
 
@@ -229,7 +234,7 @@ class EvolvStore
         $effectiveGenome = [];
         $activeEids = [];
 
-        foreach($expsKeyStates as $eid => $expKeyStates) {
+        foreach ($expsKeyStates as $eid => $expKeyStates) {
             $active = $expKeyStates['active'];
             if (array_key_exists($eid, $genomes) && $active) {
                 $activeGenome = filter($genomes[$eid], $active);
@@ -268,15 +273,15 @@ class EvolvStore
         $this->activeKeys = [];
         $this->activeVariants = [];
 
-        foreach($this->configKeyStates['experiments'] as $expKeyStates) {
+        foreach ($this->configKeyStates['experiments'] as $expKeyStates) {
             $active = $expKeyStates['active'];
             if ($active) {
-                foreach($active as $key) {
+                foreach ($active as $key) {
                     $this->activeKeys[] = $key;
                 }
                 $pruned = prune($this->effectiveGenome, $active);
                 foreach($pruned as $key => $value) {
-                    $this->activeVariants[] = $key . ':' . 'hashCode';
+                    $this->activeVariants[] = $key . ':' . hashCode(json_encode($value));
                 }
             }
         }
@@ -286,25 +291,27 @@ class EvolvStore
 
         emit(EFFECTIVE_GENOME_UPDATED, $this->effectiveGenome);
 
-        foreach($this->subscriptions as $listener) {
+        foreach ($this->subscriptions as $listener) {
             $listener($this->effectiveGenome, $this->config);
         }
 
         $this->reevaluatingContext = false;
     }
 
-    public function initialize(EvolvContext $context)
+    public function initialize(EvolvContext $context, $httpClient = null)
     {
         if ($this->initialized) {
             throw new \Exception('Evolv: The store has already been initialized.');
         }
+
+        $this->httpClient = isset($httpClient) ? $httpClient : new HttpClient();
 
         $this->context = $context;
         $this->initialized = true;
 
         $this->pull();
 
-        waitFor(CONTEXT_CHANGED, function() {
+        waitFor(CONTEXT_CHANGED, function () {
             $this->reevaluateContext();
         });
     }
@@ -321,15 +328,15 @@ class EvolvStore
 
         $this->configKeyStates['experiments'][$exp['id']] = &$expMap;
 
-        $keys = flattenKeys($clean, function($key) {
+        $keys = flattenKeys($clean, function ($key) {
             return strpos($key, '_') !== 0 || $key === '_values' || $key === '_initializers';
         });
 
-        $filteredKeys = array_filter($keys, function($key) {
+        $filteredKeys = array_filter($keys, function ($key) {
             return endsWith($key, '_values') || endsWith($key, '_initializers');
         });
 
-        foreach($filteredKeys as $key) {
+        foreach ($filteredKeys as $key) {
             $cleanKey = str_replace(['._values', '._initializers'], '', $key);
             if (!in_array($cleanKey, $expLoaded)) {
                 $expLoaded[] = $cleanKey;
@@ -360,7 +367,7 @@ class EvolvStore
 
         $this->genomeFailed = false;
 
-        foreach($value as $alloc) {
+        foreach ($value as $alloc) {
             $clean = $alloc;
             unset($clean['genome']);
             unset($clean['audience_query']);
@@ -373,7 +380,7 @@ class EvolvStore
             }
 
             $this->genomes[$clean['eid']] = $alloc['genome'];
-            
+
             $expLoaded = [];
             $expMap = [
                 'loaded' => &$expLoaded
@@ -381,17 +388,17 @@ class EvolvStore
 
             $this->genomeKeyStates['experiments'][$clean['eid']] = &$expMap;
 
-            $keys = flattenKeys($alloc['genome'], function($key) {
+            $keys = flattenKeys($alloc['genome'], function ($key) {
                 return !startsWith($key, '_');
             });
 
-            foreach($keys as $key) {
+            foreach ($keys as $key) {
                 $expLoaded[] = $key;
             }
-
-            $this->context->set('experiments.allocations', $allocs);
-            $this->context->set('experiments.exclusions', $exclusions);
         }
+
+        $this->context->set('experiments.allocations', $allocs);
+        $this->context->set('experiments.exclusions', $exclusions);
     }
 
     private function update($config, $allocation)
@@ -408,6 +415,7 @@ class EvolvStore
         $configUrl = $this->endpoint . 'v1/' . $this->environment . '/' . $this->context->uid . '/configuration.json';
 
         $arr_location = $this->httpClient->request($allocationUrl);
+
         $arr_config = $this->httpClient->request($configUrl);
 
         $arr_config = json_decode($arr_config, true);
@@ -430,20 +438,21 @@ class EvolvStore
 
     public function getActiveKeys(string $prefix = null)
     {
-        return array_filter($this->activeKeys, function($key) use ($prefix) {
+        return array_filter($this->activeKeys, function ($key) use ($prefix) {
             return !$prefix || startsWith($key, $prefix);
         });
     }
 
-    public function getValue(string $key, $effectiveGenome) {
+    public function getValue(string $key, $effectiveGenome)
+    {
         return getValueForKey($key, $effectiveGenome);
-    } 
+    }
 
     public function activeEntryPoints()
     {
         $eids = [];
 
-        foreach($this->configKeyStates['experiments'] as $eid => $expKeyStates) {
+        foreach ($this->configKeyStates['experiments'] as $eid => $expKeyStates) {
             $entry = $expKeyStates['entry'];
             if ($entry && count($entry)) {
                 $eids[] = $eid;
@@ -456,7 +465,7 @@ class EvolvStore
     public function createSubscribable(string $functionName, $key, callable $listener = null)
     {
         if (isset($listener)) {
-            $this->subscriptions[] = function($effectiveGenome, $config) use ($listener, $functionName, $key) {
+            $this->subscriptions[] = function ($effectiveGenome, $config) use ($listener, $functionName, $key) {
                 $listener(call_user_func_array([$this, $functionName], [$key, $effectiveGenome, $config]));
             };
         } else {

@@ -1,7 +1,7 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use function App\Utils\setKeyToValue;
+use function Evolv\Utils\setKeyToValue;
 
 require_once __DIR__ . '/../../App/Utils/setKeyToValue.php';
 

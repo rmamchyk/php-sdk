@@ -2,13 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App;
+namespace Evolv;
 
-use App\EvolvContext;
+use Evolv\EvolvContext;
 
 require __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/EvolvStore.php';
-require_once __DIR__ . '/Beacon.php';
 
 const ENDPOINT_PATTERN = "/\/(v\d+)\/\w+\/([a-z]+)$/i";
 
@@ -31,8 +29,6 @@ class Beacon {
 
         $data = json_encode($payload);
 
-        echo $this->endpoint;
-
         $curl = curl_init();
 
         curl_setopt($curl, CURLOPT_URL, $this->endpoint);
@@ -45,22 +41,9 @@ class Beacon {
             "Content-Type: application/json",
         );
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-
-        $data = <<<DATA
-        $data
-        DATA;
-
-        echo '<pre>';
-        print_r($data);
-        echo '</pre>';
-
         curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
 
-        $res = curl_exec($curl);
-
-        echo "<pre>";
-        print_r($res);
-        echo "</pre>";
+        curl_exec($curl);
 
         curl_close($curl);
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Utils;
+namespace Evolv\Utils;
 
 function remove_key_recursive(string $key, array $keys, array &$array)
 {

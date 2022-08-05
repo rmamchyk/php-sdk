@@ -1,7 +1,7 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use function App\Utils\flatten;
+use function Evolv\Utils\flatten;
 
 require_once __DIR__ . '/../../App/Utils/flatten.php';
 

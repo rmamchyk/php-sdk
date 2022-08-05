@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Utils;
+namespace Evolv\Utils;
 
 function set_key_recursive(string $k, array $keys, $value, array &$array)
 {

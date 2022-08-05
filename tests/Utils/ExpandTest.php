@@ -1,7 +1,7 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use function App\Utils\expand;
+use function Evolv\Utils\expand;
 
 require_once __DIR__ . '/../../App/Utils/expand.php';
 
@@ -22,7 +22,6 @@ class ExpandTest extends TestCase {
         // Act
         $result = expand($array);
 
-        print_r($result);
 
         // Assert
         $this->assertCount(2, array_keys($result));

@@ -1,10 +1,9 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use function App\Utils\getValueForKey;
+use function Evolv\Utils\getValueForKey;
 
 require_once __DIR__ . '/../../App/Utils/getValueForKey.php';
-
 
 class GetValueForKeyTest extends TestCase {
     public function testNullIsReturnedWhenEmptyArray() {

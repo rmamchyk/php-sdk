@@ -1,7 +1,7 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use function App\Utils\prune;
+use function Evolv\Utils\prune;
 
 require_once __DIR__ . '/../../App/Utils/prune.php';
 

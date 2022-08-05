@@ -1,7 +1,7 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use function App\Utils\filter;
+use function Evolv\Utils\filter;
 
 require_once __DIR__ . '/../../App/Utils/filter.php';
 

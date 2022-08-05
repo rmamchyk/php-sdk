@@ -2,16 +2,16 @@
 
 use PHPUnit\Framework\TestCase;
 
-use App\EvolvContext;
-require_once __DIR__ . '/../App/EvolvContext.php';
-
+use Evolv\EvolvContext;
 
 class ContextTest extends TestCase {
+
     protected EvolvContext $context;
+    protected $uid = "1";
 
     public function setUp(): void {
         $this->context = new EvolvContext();
-        $this->context->initialize('user_id');
+        $this->context->initialize($this->uid);
     }
 
     /**

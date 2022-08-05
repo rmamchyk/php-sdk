@@ -1,12 +1,16 @@
 <?php
 
-namespace App\Utils;
+namespace Evolv\Utils;
 
 $scopedHandlers = [];
 
 function ensureScope($it)
 {
     global $scopedHandlers;
+
+    if (!isset($scopedHandlers)) {
+      $scopedHandlers = [];
+    }
 
     if (array_key_exists($it, $scopedHandlers)) {
       return;

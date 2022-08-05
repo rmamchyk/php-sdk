@@ -8,6 +8,10 @@ function ensureScope($it)
 {
     global $scopedHandlers;
 
+    if (!isset($scopedHandlers)) {
+      $scopedHandlers = [];
+    }
+
     if (array_key_exists($it, $scopedHandlers)) {
       return;
     }

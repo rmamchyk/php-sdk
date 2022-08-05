@@ -64,7 +64,7 @@ class EvolvClient
             exit('Evolv: "uid" must be specified');
         }
 
-        $this->context->initialize($uid, $httpClients, $remoteContext, $localContext);
+        $this->context->initialize($uid, $remoteContext, $localContext);
         $this->store->initialize($this->context, $httpClients);
 
         if ($this->autoconfirm) {

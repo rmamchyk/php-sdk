@@ -151,7 +151,7 @@ class EvolvContext
      *
      * Note: This will cause the effective genome to be recomputed.
      *
-     * @param object $update  The values to update the context with.
+     * @param array $update The values to update the context with.
      * @param boolean $local If true, the values will only be added to the localContext.
      */
     public function update(array $update, $local = false) {

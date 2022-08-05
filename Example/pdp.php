@@ -1,5 +1,4 @@
 <?php
-
 declare (strict_types=1);
 
 use  Evolv\EvolvClient;
@@ -83,11 +82,11 @@ function display($arr, $title = null)
 
     <div class="collapse navbar-collapse" id="navbarsExampleDefault">
         <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-                <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-            </li>
             <li class="nav-item">
-                <a class="nav-link" href="pdp.php">PDP</a>
+                <a class="nav-link" href="index.php">Home</a>
+            </li>
+            <li class="nav-item  active">
+                <a class="nav-link" href="pdp.php">PDP<span class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item">
                 <a class="nav-link disabled">Disabled</a>
@@ -129,18 +128,24 @@ function display($arr, $title = null)
 
     <div class="jumbotron">
         <div class="container">
-            <h1 class="display-3">Hello world!</h1>
-            <p>This is a template for a simple marketing or informational website. It includes a large callout called a
-                jumbotron and three supporting pieces of content. Use it as a starting point to create something more
-                unique.</p>
             <?php
-                $client->get("home.cta_text", function ($value) {
-                    $btnTitle = empty($value) ? "Learn More" : $value;
-                    echo '<p><a class="btn btn-primary btn-lg" href="pdp.php" role="button">' . $btnTitle . '</a></p>';
+                $client->get('pdp.page_layout', function ($value) {
+                    switch ($value) {
+                        case 'Layout 1':
+                            require_once __DIR__ . '/tpl-layout1.php';
+                            break;
+                        case 'Layout 2':
+                            require_once __DIR__ . '/tpl-layout2.php';
+                            break;
+                        default:
+                            require_once __DIR__ . '/tpl-default.php';
+                            break;
+                    }
                 });
 
-                $client->context->set('native.pageCategory','home');
+                $client->context->set('native.pageCategory','pdp');
             ?>
+            <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn More</a></p>
         </div>
     </div>
 

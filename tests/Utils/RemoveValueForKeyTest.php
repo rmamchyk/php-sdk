@@ -1,7 +1,7 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use function App\Utils\removeValueForKey;
+use function Evolv\Utils\removeValueForKey;
 
 require_once __DIR__ . '/../../App/Utils/removeValueForKey.php';
 

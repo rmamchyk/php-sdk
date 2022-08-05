@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Utils;
+namespace Evolv\Utils;
 
 require_once __DIR__ . '/setKeyToValue.php';
 

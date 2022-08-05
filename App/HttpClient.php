@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App;
+namespace Evolv;
 
 class HttpClient {
     public function request(string $url)
     {
+
         $opts = array(
             'https' => array(
                 'method' => "GET",
@@ -17,9 +18,11 @@ class HttpClient {
         $opts = stream_context_create($opts);
 
         $response = file_get_contents($url, false, $opts);
+
         if (!$response) {
             exit("Request failed");
         }
+
 
         return $response;
     }

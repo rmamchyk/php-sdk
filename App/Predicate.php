@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App;
+namespace Evolv;
 
-use function App\Utils\getValueForKey;
+use function Evolv\Utils\getValueForKey;
 
 require_once __DIR__ . '/../App/Utils/getValueForKey.php';
 
@@ -63,7 +63,8 @@ class Predicate
         ];
     }
 
-    private function evaluateFilter($context, $rule): bool {
+    private function evaluateFilter($context, $rule): bool
+    {
         $value = getValueForKey($rule['field'], $context);
 
         if (strpos($rule['operator'], 'kv_') === 0 && !$value) {
@@ -73,7 +74,8 @@ class Predicate
         return $this->filters[$rule['operator']]($value, $rule['value']);
     }
 
-    private function evaluateRule($context, $predicate, $rule, array &$passedRules, array &$failedRules): bool {
+    private function evaluateRule($context, $predicate, $rule, array &$passedRules, array &$failedRules): bool
+    {
         $result = false;
 
         if (isset($rule['combinator'])) {
@@ -106,7 +108,7 @@ class Predicate
             return true;
         }
 
-        for ($i = 0; $i < count($rules); $i++) { 
+        for ($i = 0; $i < count($rules); $i++) {
             $passed = $this->evaluateRule($context, $predicate, $rules[$i], $passedRules, $failedRules);
             if ($passed && $predicate['combinator'] === 'or') {
                 return true;
@@ -147,11 +149,11 @@ class Predicate
 
         $result['rejected'] = !$this->evaluatePredicate($context, $predicate, $result['passed'], $result['failed']);
 
-        foreach($result['passed'] as $item) {
+        foreach ($result['passed'] as $item) {
             $result['touched'][] = $item['field'];
         }
 
-        foreach($result['failed'] as $item) {
+        foreach ($result['failed'] as $item) {
             $result['touched'][] = $item['field'];
         }
 

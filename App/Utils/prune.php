@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Utils;
+namespace Evolv\Utils;
 
 function prune(array $array, array $active)
 {

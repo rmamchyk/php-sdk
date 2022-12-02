@@ -6,7 +6,6 @@ namespace Evolv;
 
 use Evolv\EvolvContext;
 
-require __DIR__ . '/../vendor/autoload.php';
 
 const ENDPOINT_PATTERN = "/\/(v\d+)\/\w+\/([a-z]+)$/i";
 

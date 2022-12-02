@@ -6,9 +6,7 @@ namespace Evolv;
 
 use function Evolv\Utils\waitFor;
 use function Evolv\Utils\emit;
-use Evolv\HttpClient;
 
-require __DIR__ . '/../vendor/autoload.php';
 
 class EvolvClient
 {
@@ -30,7 +28,7 @@ class EvolvClient
      * @param bool $autoconfirm
      * @return object
      */
-    public function __construct(string $environment, string $endpoint = 'https://participants.evolv.ai/',  bool $autoconfirm = true, $llist = false)
+    public function __construct(string $environment, string $endpoint = 'https://participants.evolv.ai/', bool $autoconfirm = true)
     {
         $this->context = new EvolvContext();
         $this->store = new EvolvStore($environment, $endpoint);

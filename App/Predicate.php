@@ -5,23 +5,23 @@ declare(strict_types=1);
 namespace Evolv;
 
 use function Evolv\Utils\getValueForKey;
+use function Evolv\Utils\regexFromString;
 
 require_once __DIR__ . '/../App/Utils/getValueForKey.php';
+require_once __DIR__ . '/../App/Utils/regexFromString.php';
 
-function regexFromString($string)
+
+function regex64Match($value, $b64pattern): bool
 {
-    if (strpos($string, '/') !== 0) {
-        return '/' . $string . '/';
-    }
+    $pattern = base64_decode($b64pattern);
 
-    return $string;
+    return regexMatch($value, $pattern);
 }
 
-function regex64Match($value, $b64pattern)
+function regexMatch($value, $pattern): bool
 {
     try {
-        $string = base64_decode($b64pattern);
-        return $value && preg_match(regexFromString($string), $value, $matches) !== null;
+        return isset($value) && preg_match(regexFromString($pattern), $value, $matches);
     } catch (\Throwable $th) {
         return false;
     }
@@ -34,8 +34,8 @@ class Predicate
     public function __construct()
     {
         $this->filters = [
-            'contains' => function ($a, $b) { return in_array($a, $b); },
-            'defined' => function ($a, $b) { return (isset($a) && !empty($a)) ? true : false; },
+            'contains' => function ($a, $b) { return strpos($a, $b) !== false; },
+            'defined' => function ($a, $b) { return isset($a); },
             'equal' => function ($a, $b) { return $a === $b; },
             'exists' => function ($a, $b) { return isset($a); },
             'greater_than' => function ($a, $b) { return ($a > $b) ? true : false; },
@@ -43,21 +43,21 @@ class Predicate
             'is_true' => function ($a, $b) { return $a === true; },
             'is_false' => function ($a, $b) { return $a === false; },
             'not_exists' => function ($a, $b) { return !isset($a); },
-            'not_contains' => function ($a, $b) { return !in_array($a, $b); },
-            'not_defined' => function ($a, $b) { return (isset($a) && empty($a)) ? true : false; },
+            'not_contains' => function ($a, $b) { return strpos($a, $b) === false; },
+            'not_defined' => function ($a, $b) { return !isset($a); },
             'not_equal' => function ($a, $b) { return ($a !== $b) ? true : false; },
-            'not_regex_match' => function ($value, $pattern) { return !preg_match($value, $pattern, $matches); },
+            'not_regex_match' => function ($value, $pattern) { return !regexMatch($value, $pattern); },
             'not_regex64_match' => function ($value, $pattern) { return !regex64Match($value, $pattern); },
             'not_starts_with' => function ($a, $b) { return strpos($a, $b) !== 0; },
-            'kv_contains' => function ($obj, $params) { return $obj[$params[0]] !== $params[1]; },
-            'kv_equal' => function ($obj, $params) { return $obj[$params[0]] === $params[1]; },
-            'kv_not_contains' => function ($obj, $params) { return $obj[$params[0]] === $params[1]; },
-            'kv_not_equal' => function ($obj, $params) { return $obj[$params[0]] !== $params[1]; },
+            'kv_contains' => function ($obj, $params) { return array_key_exists($params[0], $obj) && strpos($obj[$params[0]], $params[1]) !== false; },
+            'kv_equal' => function ($obj, $params) { return array_key_exists($params[0], $obj) && $obj[$params[0]] === $params[1]; },
+            'kv_not_contains' => function ($obj, $params) { return !(array_key_exists($params[0], $obj) && strpos($obj[$params[0]], $params[1]) !== false); },
+            'kv_not_equal' => function ($obj, $params) { return !(array_key_exists($params[0], $obj) && $obj[$params[0]] === $params[1]); },
             'less_than' => function ($a, $b) { return $a < $b; },
             'less_than_or_equal_to' => function ($a, $b) { return $a <= $b; },
             'loose_equal' => function ($a, $b) { return $a == $b; },
             'loose_not_equal' => function ($a, $b) { return $a != $b; },
-            'regex_match' => function ($a, $b) { return $a != $b ? true : false; },
+            'regex_match' => function ($value, $pattern) { return regexMatch($value, $pattern); },
             'regex64_match' => function ($value, $pattern) { return regex64Match($value, $pattern); },
             'starts_with' => function ($a, $b) { return strpos($a, $b) === 0; }
         ];
@@ -87,7 +87,7 @@ class Predicate
         }
 
         $ruleResult = [
-            'id' => $predicate['id'],
+            'id' => $predicate['id'] ?? null,
             'field' => $rule['field']
         ];
 

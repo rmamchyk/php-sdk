@@ -122,8 +122,8 @@ class EvolvStore
             $entry[] = $prefix;
         }
 
-        $keys = array_filter(array_keys($config), function ($key) {
-            return !startsWith($key, '_');
+        $keys = array_filter(array_keys($config), function ($key) use ($config) {
+            return !startsWith($key, '_') && is_array($config[$key]);
         });
 
         foreach ($keys as $key) {

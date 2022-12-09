@@ -7,7 +7,12 @@ namespace Evolv;
 use function Evolv\Utils\waitFor;
 use function Evolv\Utils\emit;
 
-
+/**
+ * The EvolvClient provides a low level integration with the Evolv participant APIs.
+ * 
+ * The client provides asynchronous access to key states, values, contexts, and configurations.
+ * 
+ */
 class EvolvClient
 {
     const INITIALIZED = 'initialized';
@@ -16,6 +21,9 @@ class EvolvClient
     const EVENT_EMITTED = 'event.emitted';
 
     public bool $initialized = false;
+    /**
+     * The context against which the key predicates will be evaluated.
+     */
     public EvolvContext $context;
     private $store;
     private bool $autoconfirm;
@@ -23,9 +31,9 @@ class EvolvClient
     private Beacon $eventBeacon;
 
     /**
-     * @param string $environment
-     * @param string $endpoint
-     * @param bool $autoconfirm
+     * @param string $environment The current environment id.
+     * @param string $endpoint The participants API endpoint.
+     * @param bool $autoconfirm Optional. True by default. The autoconfirm flag.
      * @return object
      */
     public function __construct(string $environment, string $endpoint = 'https://participants.evolv.ai/', bool $autoconfirm = true)
@@ -44,14 +52,11 @@ class EvolvClient
      * Initializes the client with required context information.
      *
      * @param string $uid A globally unique identifier for the current participant.
-     * @param object $remoteContext A map of data used for evaluating context predicates and analytics.
-     * @param object $localContext A map of data used only for evaluating context predicates.
-     * @return array
+     * @param array $remoteContext A map of data used for evaluating context predicates and analytics.
+     * @param array $localContext A map of data used only for evaluating context predicates.
      */
-
     public function initialize(string $uid, array $remoteContext = [], array $localContext = [], $httpClient = null)
     {
-
         if ($this->initialized) {
             throw new \Exception('Evolv: Client is already initialized');
             exit('Evolv: Client is already initialized');
@@ -61,15 +66,6 @@ class EvolvClient
             throw new \Exception('Evolv: "uid" must be specified');
             exit('Evolv: "uid" must be specified');
         }
-
-        $this->context->initialize($uid, $remoteContext, $localContext);
-        $this->store->initialize($this->context, $httpClient);
-
-        if ($this->autoconfirm) {
-            $this->confirm();
-        }
-
-        $this->initialized = true;
 
         waitFor(CONTEXT_INITIALIZED, function($type, $ctx) {
             $this->contextBeacon->emit($type, $this->context->remoteContext);
@@ -81,12 +77,27 @@ class EvolvClient
             }
             $this->contextBeacon->emit($type, ['key' => $key, 'value' => $value]);
         });
-        waitFor(CONTEXT_VALUE_CHANGED, function($type, $key, $value, $local) {
+        waitFor(CONTEXT_VALUE_CHANGED, function($type, $key, $value, $before, $local) {
             if ($local) {
                 return;
             }
             $this->contextBeacon->emit($type, ['key' => $key, 'value' => $value]);
         });
+        waitFor(CONTEXT_VALUE_REMOVED, function ($type, $key, $local) {
+            if ($local) {
+                return;
+            }
+            $this->contextBeacon->emit($type, ['key' => $key]);
+        });
+
+        $this->context->initialize($uid, $remoteContext, $localContext);
+        $this->store->initialize($this->context, $httpClient);
+
+        if ($this->autoconfirm) {
+            $this->confirm();
+        }
+
+        $this->initialized = true;
 
         emit(EvolvClient::INITIALIZED);
     }
@@ -117,8 +128,7 @@ class EvolvClient
      *
      * @param string $topic The event topic on which the listener should be invoked.
      * @param callable $listener The listener to be invoked for the specified topic.
-     * @function
-     * @see  EvolvClient for listeners that should only be invoked once.
+     * @see EvolvClient for listeners that should only be invoked once.
      */
     public function on(string $topic, callable $listener)
     {
@@ -129,8 +139,8 @@ class EvolvClient
      * Send an event to the events endpoint.
      *
      * @param string $type The type associated with the event.
-     * @param object $metadata  Any metadata to attach to the event.
-     * @param boolean $flush If true, the event will be sent immediately.
+     * @param mixed $metadata  Any metadata to attach to the event.
+     * @param bool $flush If true, the event will be sent immediately.
      */
     public function emit(string $type, $metadata, bool $flush = false)
     {
@@ -146,9 +156,8 @@ class EvolvClient
      * Check all active keys that start with the specified prefix.
      *
      * @param string $prefix The prefix of the keys to check.
-     * @returns {SubscribablePromise.<Object|Error>} A SubscribablePromise that resolves to object
-     * describing the state of active keys.
-     * @function
+     * @param callable $listener Optional. The callback function to listen to active keys changes.
+     * @return array An array describing the state of active keys.
      */
     public function getActiveKeys(string $prefix = '', callable $listener = null)
     {
@@ -159,8 +168,8 @@ class EvolvClient
      * Get the value of a specified key.
      *
      * @param string $key The key of the value to retrieve.
-     * @returns @mixed A value of the specified key.
-     * @function
+     * @param callable $listener Optional. The callback function to listen to the specified key changes.
+     * @return mixed A value of the specified key.
      */
     public function get(string $key = '', callable $listener = null)
     {
@@ -229,12 +238,12 @@ class EvolvClient
      * Marks a consumer as unsuccessfully retrieving and / or applying requested values, making them ineligible for
      * inclusion in optimization statistics.
      *
-     * @param  object $details Optional. Information on the reason for contamination. If provided, the object should
+     * @param array $details Optional. Information on the reason for contamination. If provided, the object should
      * contain a reason. Optionally, a 'details' value should be included for extra debugging info
-     * @param boolean $allExperiments If true, the user will be excluded from all optimizations, including optimization
+     * @param bool $allExperiments If true, the user will be excluded from all optimizations, including optimization
      * not applicable to this page
      */
-    public function contaminate($details, bool $allExperiments = false)
+    public function contaminate(array $details, bool $allExperiments = false)
     {
         $allocations = $this->context->get('experiments.allocations');
         if (!isset($allocations) || !count($allocations)) {
@@ -281,10 +290,3 @@ class EvolvClient
         emit(EvolvClient::CONTAMINATED);
     }
 }
-
-
-
-
-
-
-

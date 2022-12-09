@@ -124,19 +124,19 @@ class Predicate
 
     /**
      * @typedef EvaluationResult
-     * @property {Set<object>} passed
-     * @property {Set<object>} failed
-     * @property {boolean} rejected
-     * @property {Set<string>} touched
+     * @property array passed
+     * @property array failed
+     * @property array rejected
+     * @property array touched
      */
 
     /**
      * Evaluates a query against a user object and saves passing/failing rule ids to provided sets.
-     * @param context A context object containing describing the context the predicate should be evaluated against.
-     * @param predicate Nested predicate object that rules structured into groups as a deeply nested tree.
+     * @param array context A context object containing describing the context the predicate should be evaluated against.
+     * @param array predicate Nested predicate object that rules structured into groups as a deeply nested tree.
      *                  note: There is no set limit to the depth of this tree, hence we must work with it
      *                  using recursion.
-     * @returns {EvaluationResult}
+     * @return {EvaluationResult}
      */
     public function evaluate($context, $predicate)
     {

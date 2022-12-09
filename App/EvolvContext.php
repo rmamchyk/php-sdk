@@ -25,10 +25,28 @@ const CONTEXT_DESTROYED = 'context.destroyed';
 
 const DEFAULT_QUEUE_LIMIT = 50;
 
+/**
+ * The EvolvContext provides functionality to manage data relating to the client state, or context in which the
+ * variants will be applied.
+ *
+ * This data is used for determining which variables are active, and for general analytics.
+ *
+ */
 class EvolvContext
 {
+    /**
+     * A unique identifier for the participant.
+     */
     public string $uid;
+
+    /**
+     * The context information for evaluation of predicates and analytics.
+     */
     public array $remoteContext = [];
+
+    /**
+     * The context information for evaluation of predicates only, and not used for analytics.
+     */
     public array $localContext = [];
     private bool $initialized = false;
 
@@ -39,6 +57,11 @@ class EvolvContext
         }
     }
 
+    /**
+     * Computes the effective context from the local and remote contexts.
+     *
+     * @return array The effective context from the local and remote contexts.
+     */
     public function resolve()
     {
         $this->ensureInitialized();
@@ -109,7 +132,7 @@ class EvolvContext
      * Retrieve a value from the context.
      *
      * @param string $key The kay associated with the value to retrieve.
-     * @returns {*} The value associated with the specified key.
+     * @return mixed The value associated with the specified key.
      */
     public function get(string $key)
     {
@@ -128,7 +151,7 @@ class EvolvContext
      *
      * Note: This will cause the effective genome to be recomputed.
      *
-     * @param  string $key  The key to remove from the context.
+     * @param string $key The key to remove from the context.
      */
     public function remove(string $key)
     {
@@ -152,7 +175,7 @@ class EvolvContext
      * Note: This will cause the effective genome to be recomputed.
      *
      * @param array $update The values to update the context with.
-     * @param boolean $local If true, the values will only be added to the localContext.
+     * @param bool $local If true, the values will only be added to the localContext.
      */
     public function update(array $update, $local = false) {
         $this->ensureInitialized();
@@ -187,8 +210,8 @@ class EvolvContext
     /**
      * Checks if the specified key is currently defined in the context.
      *
-     * @param $key The key to check.
-     * @returns bool True if the key has an associated value in the context.
+     * @param string $key The key to check.
+     * @return bool True if the key has an associated value in the context.
      */
     public function contains(string $key)
     {
@@ -202,9 +225,9 @@ class EvolvContext
      *
      * @param string $key The array to add to.
      * @param array $value Value to add to the array.
-     * @param bool $local {Boolean} If true, the value will only be added to the localContext.
-     * @param int $limit {Number} Max length of array to maintain.
-     * @returns boolean True if value was successfully added.
+     * @param bool $local If true, the value will only be added to the localContext.
+     * @param int $limit Max length of array to maintain.
+     * @return bool True if value was successfully added.
      */
     public function pushToArray(string $key, $value, $local = false, $limit = null)
     {

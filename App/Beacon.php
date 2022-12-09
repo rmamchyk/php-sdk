@@ -7,6 +7,7 @@ namespace Evolv;
 use Evolv\EvolvContext;
 
 
+const CLIENT_NAME = 'php-sdk';
 const ENDPOINT_PATTERN = "/\/(v\d+)\/\w+\/([a-z]+)$/i";
 
 class Beacon {
@@ -53,7 +54,7 @@ class Beacon {
     {
         return [
             'uid' => $this->context->uid,
-            'client' => 'php-sdk',
+            'client' => CLIENT_NAME,
             'messages' => $this->messages
         ];
     }
@@ -67,7 +68,7 @@ class Beacon {
         if ($this->v1Events) {
             foreach($this->messages as $message) {
                 $editedMessage = $message;
-                $editedMessage = $message['payload'] ?? [];
+                $editedMessage = $message['payload'];
                 $editedMessage['type'] = $message['type'];
 
                 $this->send($editedMessage);
@@ -81,7 +82,7 @@ class Beacon {
     {
         $this->messages[] = [
             'type' => $type,
-            'payload' => $payload,
+            'payload' => empty($payload) ? new \stdClass() : $payload,
             'timestamp' => time()
         ];
 
@@ -91,4 +92,4 @@ class Beacon {
     public function flush() {
         $this->transmit();
     }
-} 
+}

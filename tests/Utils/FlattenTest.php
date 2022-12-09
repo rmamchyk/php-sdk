@@ -35,4 +35,35 @@ class FlattenTest extends TestCase {
             'value2' => 'value2'
         ]);
     }
+
+    /**
+     * @test
+     */
+    public function shouldCorrectlyFlattenNestedList() {
+        // Arrange
+        $array = [
+            'experiments' => [
+                'confirmations' => [
+                    [
+                        'cid' => '7da22c6c3ad8:b3b78ae95f',
+                        'timestamp' => 1670578648
+                    ]
+                ]
+            ]
+        ];
+
+        // Act
+        $result = flatten($array);
+
+        // Assert
+        $this->assertCount(1, $result);
+        $this->assertEquals($result, [
+            'experiments.confirmations' => [
+                [
+                    'cid' => '7da22c6c3ad8:b3b78ae95f',
+                    'timestamp' => 1670578648
+                ]
+            ]
+        ]);
+    }
 }

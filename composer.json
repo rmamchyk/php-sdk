@@ -2,13 +2,13 @@
     "name": "evolv/php-sdk",
     "description": "This is the official PHP client for the Evolv AI optimization platform.",
     "type": "library",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "require-dev": {
         "phpunit/phpunit": "^9.5",
         "phpdocumentor/phpdocumentor":  "v3.1.2",
         "phpdocumentor/shim": "3.1.2"
     },
-    "license": "GPL-3.0-only",
+    "license": "MIT",
     "autoload": {
         "psr-4": {
             "Evolv\\": "App/"

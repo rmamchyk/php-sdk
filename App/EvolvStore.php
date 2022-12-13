@@ -389,7 +389,7 @@ class EvolvStore
             $this->genomeKeyStates['experiments'][$clean['eid']] = &$expMap;
 
             $keys = flattenKeys($alloc['genome'], function ($key) {
-                return !startsWith($key, '_');
+                return is_string($key) && !startsWith($key, '_');
             });
 
             foreach ($keys as $key) {

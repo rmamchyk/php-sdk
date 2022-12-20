@@ -10,6 +10,16 @@ use Evolv\EvolvClient;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+$environment = '7f4099bfbc';
+$uid = 'user_id';
+$endpoint = 'https://participants-stg.evolv.ai/';
+
+$client = new EvolvClient($environment, $endpoint);
+$client->initialize($uid);
+
+$client->context->set('native.newUser', true);
+$client->context->set('native.pageCategory','home');
+
 function display($arr, $title = null)
 {
     if ($title) {
@@ -113,37 +123,34 @@ function display($arr, $title = null)
 </nav>
 
 <main role="main">
-
-    <div class="container" style="padding-top: 20px; padding-bottom: 20px;">
-        <div class="row">
-            <div class="col">
-                <?php
-                    $environment = '7f4099bfbc';
-                    $uid = 'user_id';
-                    $endpoint = 'https://participants-stg.evolv.ai/';
-
-                    $client = new EvolvClient($environment, $endpoint, $autoconfirm = true);
-                    $client->initialize($uid);
-
-                    $client->context->set('native.newUser', true);
-                ?>
-            </div>
-        </div>
-    </div>
-
     <div class="jumbotron">
         <div class="container">
             <h1 class="display-3">Hello world!</h1>
             <p>This is a template for a simple marketing or informational website. It includes a large callout called a
                 jumbotron and three supporting pieces of content. Use it as a starting point to create something more
                 unique.</p>
+
+            <p>
+                <a class="btn btn-primary btn-lg" href="pdp.php" role="button">
+                    <?php
+                        $client->get("home.cta_text", function ($value) {
+                            $btnTitle = empty($value) ? "Learn More" : $value;
+                            echo $btnTitle;
+                        });
+                    ?>
+                </a>
+            </p>
+
             <?php
-                $client->get("home.cta_text", function ($value) {
-                    $btnTitle = empty($value) ? "Learn More" : $value;
-                    echo '<p><a class="btn btn-primary btn-lg" href="pdp.php" role="button">' . $btnTitle . '</a></p>';
+                $client->on('initialized', function() {
+                    echo '<h1>initialized</h1>';
                 });
 
-                $client->context->set('native.pageCategory','home');
+                $client->getActiveKeys('', function($keys) {
+                    display($keys, 'Active Keys');
+                });
+
+                display($client->context->remoteContext);
             ?>
         </div>
     </div>

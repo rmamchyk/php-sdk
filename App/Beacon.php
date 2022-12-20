@@ -27,25 +27,35 @@ class Beacon {
 
     private function send($payload) {
 
-        $data = json_encode($payload);
+        // $data = json_encode($payload);
 
-        $curl = curl_init();
+        // $curl = curl_init();
 
-        curl_setopt($curl, CURLOPT_URL, $this->endpoint);
-        curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_HEADER, true);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        // echo $this->endpoint;
 
-        $headers = array(
-            "Accept: application/json",
-            "Content-Type: application/json",
-        );
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+        // curl_setopt($curl, CURLOPT_URL, $this->endpoint);
+        // curl_setopt($curl, CURLOPT_POST, true);
+        // curl_setopt($curl, CURLOPT_HEADER, true);
+        // curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 
-        curl_exec($curl);
+        // $headers = array(
+        //     "Accept: application/json",
+        //     "Content-Type: application/json",
+        // );
+        // curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        // curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
 
-        curl_close($curl);
+        // echo '<pre>';
+        // print_r($data);
+        // echo '</pre>';
+
+        // $res = curl_exec($curl);
+
+        // echo "<pre>";
+        // print_r($res);
+        // echo "</pre>";
+
+        // curl_close($curl);
 
         $this->messages = [];
     }
